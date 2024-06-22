@@ -30,15 +30,27 @@ def get_data_from_user():
     return username, password
 
 
+def display_available_platform():
+    query = f"SHOW TABLES;"
+    cursor.execute(query)
+    platforms = cursor.fetchall()
+    individual_platforms = [platform[0] for platform in platforms]
+    for platform in individual_platforms:
+        print(platform)
+    return individual_platforms
+
+
 def get_platform():
     individual_platforms = display_available_platform()
     platform = str(input("Enter your platform (a to add a new platform) : "))
     if platform in individual_platforms:
         return platform
     elif platform == "a":
-        new_platform = input("Enter name of platform")
-        query = f"CREATE TABLE Instagram (No INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(64), password BLOB, encryption_key BLOB );"
+        new_platform = input("Enter name of new platform : ")
+        query = f"CREATE TABLE {new_platform} (No INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(64), password BLOB, encryption_key BLOB );"
         cursor.execute(query)
+        print("new Platform Added")
+        return new_platform
 
 
 def save_data(username, password, platform):
@@ -60,16 +72,6 @@ def display_menu():
     print("5: Exit")
 
 
-def display_available_platform():
-    query = f"SHOW TABLES;"
-    cursor.execute(query)
-    platforms = cursor.fetchall()
-    individual_platforms = [platform[0] for platform in platforms]
-    for platform in individual_platforms:
-        print(platform)
-    return individual_platforms
-
-
 def main():
     while True:
         display_menu()
@@ -78,6 +80,7 @@ def main():
             username, password = get_data_from_user()
             platform = get_platform()
             save_data(username=username, password=password, platform=platform)
+            print(f"Username and password saved successfully in {platform}.")
         elif x == 2:
             print("Check password feature is not implemented yet.")
         elif x == 3:
@@ -86,3 +89,6 @@ def main():
             print("Delete password feature is not implemented yet.")
         elif x == 5:
             break
+
+
+main()
