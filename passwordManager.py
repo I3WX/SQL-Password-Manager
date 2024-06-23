@@ -1,16 +1,20 @@
-from turtle import update
 from cryptography.fernet import Fernet
 import mysql.connector
+from mysql.connector import Error
+import re
 
 Host = "localhost"
 username = "root"
 password = "Admin"
 database = "PasswordManager"
 
-conn = mysql.connector.connect(
-    host=Host, user=username, password=password, database=database
-)
-cursor = conn.cursor()
+try:
+    conn = mysql.connector.connect(
+        host=Host, user=username, password=password, database=database
+    )
+    cursor = conn.cursor()
+except Error as e:
+    print(f"Error connecting to MySQL: {e}")
 
 
 def get_key():
@@ -27,6 +31,13 @@ def decrypt_password(encrypted_password, key):
     cipher_suite = Fernet(key=key)
     password = cipher_suite.decrypt(encrypted_password).decode()
     return password
+
+
+def sanitize_platform_name(name):
+    if re.match("^[A-Za-z0-9_]+$", name):
+        return name
+    else:
+        raise ValueError("Invalid platform name.")
 
 
 def get_data_from_user():
@@ -57,7 +68,10 @@ def get_platform(allow_new_platform_input=True):
         if platform in individual_platforms:
             return platform
         elif allow_new_platform_input and platform == "a":
-            new_platform = input("Enter name of new platform : ")
+            new_platform = sanitize_platform_name(
+                input("Enter name of new platform : ")
+            )
+
             query = f"CREATE TABLE {new_platform} (No INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(64), password BLOB, encryption_key BLOB );"
             cursor.execute(query)
             print("New Platform Added")
