@@ -264,8 +264,8 @@ def main():
             continue
 
         if choice == 1:
-            username, password = get_data_from_user()
             platform = get_platform()
+            username, password = get_data_from_user()
             save_data(username=username, password=password, platform=platform)
             print(f"Username and password saved successfully in {platform}.")
         elif choice == 2:
